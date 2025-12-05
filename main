@@ -1,0 +1,49 @@
+import shapefile
+import fltk as fl
+import math
+
+def init():
+    france = []
+    sf = shapefile.Reader("departements-20180101")
+    #r = sf.records()
+    for i in range(96):
+        departements = sf.shape(i)
+        #extreme = seine_et_marne.bbox
+        points = departements.points
+        france.append(points)
+    #print(extreme)
+    #print(points)
+    return france
+
+def convertir():
+    r = 2000
+    france = init()
+    carte = []
+    for i in france:
+        poly = []
+        for j in i:
+            coord = []
+            long = j[0]
+            lati = j[1]
+            lon = math.radians(long)
+            lat = math.radians(lati)
+            x = r * lon + 1000
+            y = r * math.log(math.tan(math.pi / 4 + lat / 2)) - 1500
+            coord.append(x)
+            coord.append(y)
+            poly.append(coord)
+        carte.append(poly)
+    #print(carte)
+    return carte
+
+def tracer():
+    global longueur, hauteur
+    longueur = 1920
+    hauteur = 1000
+    carte = convertir()
+    fl.cree_fenetre(longueur, hauteur)
+    for i in carte:
+        fl.polygone(i)
+
+tracer()
+fl.attend_fermeture()
